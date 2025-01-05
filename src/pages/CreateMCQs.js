@@ -1,53 +1,45 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { generateLearningOutcomes } from '../utils/azureAPI';
+import { generateMCQs } from '../utils/azureAPI';
+// import "./CreateMCQs.css";
 
 const CreateMCQs = () => {
-  const { content, setContent, learningOutcomes, setLearningOutcomes, selectedOutcomes, setSelectedOutcomes } = useAppContext();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { content, selectedOutcomes, mcqConfig, setMcqConfig, setMcqs } = useAppContext();
+  const [isCreating, setIsCreating] = useState(false);
 
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    const outcomes = await generateLearningOutcomes(content);
-    setLearningOutcomes(outcomes);
-    setIsGenerating(false);
+  const handleInputChange = (index, value) => {
+    setMcqConfig((prev) => {
+      const newConfig = [...prev];
+      newConfig[index].count = value;
+      return newConfig;
+    });
   };
 
-  const handleCheckboxChange = (outcome) => {
-    setSelectedOutcomes((prev) =>
-      prev.includes(outcome)
-        ? prev.filter((item) => item !== outcome)
-        : [...prev, outcome]
-    );
+  const handleCreateMCQs = async () => {
+    setIsCreating(true);
+    const mcqs = await generateMCQs(content, selectedOutcomes, mcqConfig);
+    console.log("mcqsssssssssssssssssssssssssssssssss",mcqs)
+    setMcqs(mcqs);
+    setIsCreating(false);
   };
 
   return (
-    <div>
-      <h1>Create MCQs</h1>
-      <textarea
-        placeholder="Enter content or upload a file"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      <button onClick={handleGenerate} disabled={!content || isGenerating}>
-        {isGenerating ? 'Generating...' : 'Generate Learning Outcomes'}
-      </button>
-
-      {learningOutcomes.length > 0 && (
-        <div>
-          <h2>Learning Outcomes</h2>
-          {learningOutcomes.map((outcome, index) => (
-            <div key={index}>
-              <input
-                type="checkbox"
-                checked={selectedOutcomes.includes(outcome)}
-                onChange={() => handleCheckboxChange(outcome)}
-              />
-              <label>{outcome}</label>
-            </div>
-          ))}
+    <div className="create-mcqs-container">
+      <h1 className="page-title">Create MCQs</h1>
+      {selectedOutcomes.map((outcome, index) => (
+        <div key={index} className="mcq-config-item">
+          <label>{outcome}</label>
+          <input
+            type="number"
+            min="1"
+            value={mcqConfig[index]?.count || 1}
+            onChange={(e) => handleInputChange(index, e.target.value)}
+          />
         </div>
-      )}
+      ))}
+      <button className="btn generate-btn" onClick={handleCreateMCQs} disabled={isCreating}>
+        {isCreating ? 'Creating MCQs...' : 'Create MCQs'}
+      </button>
     </div>
   );
 };

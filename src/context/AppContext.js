@@ -6,6 +6,8 @@ export const AppProvider = ({ children }) => {
   const [content, setContent] = useState('');
   const [learningOutcomes, setLearningOutcomes] = useState([]);
   const [selectedOutcomes, setSelectedOutcomes] = useState([]);
+  const [mcqConfig, setMcqConfig] = useState([]);
+  const [mcqs, setMcqs] = useState([]);
 
   return (
     <AppContext.Provider
@@ -16,6 +18,10 @@ export const AppProvider = ({ children }) => {
         setLearningOutcomes,
         selectedOutcomes,
         setSelectedOutcomes,
+        mcqConfig,
+        setMcqConfig,
+        mcqs,
+        setMcqs,
       }}
     >
       {children}
